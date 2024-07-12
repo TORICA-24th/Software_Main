@@ -281,7 +281,7 @@ void setup() {
     }
   }
 
-  add_repeating_timer_us(1000000, speaker, NULL, &st_timer);
+  add_repeating_timer_us(10000, speaker, NULL, &st_timer);
   
   // センサー・各基板の起動を待機
   for (int i = 0; i < 3; i++) {
@@ -307,9 +307,7 @@ void loop() {
   // テレメトリダウンリンク(タイミングも関数内調整)
   TWE_downlink();
   //スピーカー
-  //speaker();
-
-
+  //speaker(); //割り込みに実装変更
 }
 
 
@@ -425,7 +423,7 @@ void determine_flight_phase() {
         }
         bool over_urm_range = false;
         // 超音波が測定不能な状態が2秒以上続いたとき
-        if (over_urm_range_count >= 200) {
+        if (over_urm_range_count >= 100) {
           over_urm_range = true;
         }
         // 気圧センサにより下降したと判断したとき
@@ -454,13 +452,16 @@ void determine_flight_phase() {
       /*if (filtered_under_urm_altitude_m.get() < 5.0 && estimated_altitude_lake_m < 5.0) {
         flight_phase = MID_LEVEL;
       }*/
-      if (filtered_under_urm_altitude_m.get() < 5.0) {
+      if (filtered_under_urm_altitude_m.get() < 1.0) {
         flight_phase = MID_LEVEL;
       }
       break;
     case MID_LEVEL:
-      // 高度が1m以下になったとき(高度を高頻度で読み上げる)
-      if (estimated_altitude_lake_m < 1.0) {
+      // 高度が1m以下になったとき
+      /*if (estimated_altitude_lake_m < 0.5) {
+        flight_phase = LOW_LEVEL;
+      }*/
+      if (filtered_under_urm_altitude_m.get() < 0.3) {
         flight_phase = LOW_LEVEL;
       }
       break;
